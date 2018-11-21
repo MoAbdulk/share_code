@@ -3,7 +3,7 @@
 #install.packages("cowplot")
 #install.packages("gridExtra")
 
-#load the required packages. If not uncomment line 2 to 4 (see above).
+#load the required packages. If not already installed uncomment line 2 to 4 (see above).
 library(ggplot2)
 library(cowplot)
 library(gridExtra)
