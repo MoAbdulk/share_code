@@ -1,3 +1,5 @@
+library(ggplot2)
+
 #creat an example dataset with 10 columns
 
 hist_col1 <- rnorm(10000, mean = 50, sd = 1)
