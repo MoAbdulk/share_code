@@ -1,17 +1,19 @@
 library(ggplot2)
+library(cowplot)
+library(gridExtra)
 
 #creat an example dataset with 10 columns
 
-hist_col1 <- rnorm(10000, mean = 50, sd = 1)
-hist_col2 <- rnorm(10000, mean = 25, sd = 1)
-hist_col3 <- rnorm(10000, mean = 15, sd = 1)
-hist_col4 <- rnorm(10000, mean = 55, sd = 1)
-hist_col5 <- rnorm(10000, mean = 75, sd = 1)
-hist_col6 <- rnorm(10000, mean = 115, sd = 1)
-hist_col7 <- rnorm(10000, mean = 225, sd = 1)
-hist_col8 <- rnorm(10000, mean = 235, sd = 1)
-hist_col9 <- rnorm(10000, mean = 5, sd = 1)
-hist_col10 <- rnorm(10000, mean = 30, sd = 1)
+hist_col1 <- rnorm(1000, mean = 50, sd = 1)
+hist_col2 <- rnorm(1000, mean = 25, sd = 1)
+hist_col3 <- rnorm(1000, mean = 15, sd = 1)
+hist_col4 <- rnorm(1000, mean = 55, sd = 1)
+hist_col5 <- rnorm(1000, mean = 75, sd = 1)
+hist_col6 <- rnorm(1000, mean = 115, sd = 1)
+hist_col7 <- rnorm(1000, mean = 225, sd = 1)
+hist_col8 <- rnorm(1000, mean = 235, sd = 1)
+hist_col9 <- rnorm(1000, mean = 5, sd = 1)
+hist_col10 <- rnorm(1000, mean = 30, sd = 1)
 
 df_hist <- data.frame(hist_col1, hist_col2, hist_col3, hist_col4, hist_col5, hist_col6, hist_col7, hist_col8, hist_col9, hist_col10)
 
@@ -19,19 +21,37 @@ df_hist <- data.frame(hist_col1, hist_col2, hist_col3, hist_col4, hist_col5, his
 
 create_save_hist <- function(df){
   
+  list_plots <- list()
+  
   for(i in seq_along(df)){
     
+    #get p-value for normality test (Shapiro-Wilk’s test)
+    
+    shapiro_test_results <- shapiro.test(df[[i]])
+    shapiro_P <- shapiro_test_results$p.value
+    
     df_plot <- ggplot(df, aes(df[[i]])) +
-    geom_histogram() +
-    ggtitle(paste0("histogram of ", colnames(df[i]))) +
-    xlab("")
-    print(df_plot)
-    plot(df_plot)
-    ggsave(df_plot, filename=paste(colnames(df[i]),".jpeg",sep=""))
+      geom_histogram() +
+      ggtitle(paste0("histogram of ", colnames(df[i]), ", P-value Shapiro-Wilk = ", round(shapiro_P, digits = 2))) +
+      xlab("")
+    
+    #save the plot (uncomment if you want to save the plot to your current working directory)
+    
+    #ggsave(df_plot, filename=paste(colnames(df[i]),".jpeg",sep=""))
+    
+    
+    list_plots <- c(list_plots, list(df_plot))
+    
     
   }
+  
+  return(list_plots)
   
 }
 
 #using the function to plot and save the histogram on the example dataset
-create_save_hist(df_hist)
+list_output_functions <- create_save_hist(df_hist)
+
+
+#print in a grid (select number of plots per grid. in this example the first two histograms are plotted)
+plot_grid(plotlist = list_output_functions[1:2], labels=c('A','B'), align = "h", ncol = 2, rel_widths = c(1,1))
