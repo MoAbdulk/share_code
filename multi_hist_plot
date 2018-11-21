@@ -1,4 +1,5 @@
-#creat a example dataset with 10 columns
+#creat an example dataset with 10 columns
+
 hist_col1 <- rnorm(10000, mean = 50, sd = 1)
 hist_col2 <- rnorm(10000, mean = 25, sd = 1)
 hist_col3 <- rnorm(10000, mean = 15, sd = 1)
@@ -12,18 +13,23 @@ hist_col10 <- rnorm(10000, mean = 30, sd = 1)
 
 df_hist <- data.frame(hist_col1, hist_col2, hist_col3, hist_col4, hist_col5, hist_col6, hist_col7, hist_col8, hist_col9, hist_col10)
 
-#function to create the histogram
-create_hist <- function(x, data){
-ggplot(data, aes(x)) +
-  geom_histogram() +
-    ggtitle(paste0("histogram of ", colnames(data))) +
+#function to plot and save multiple histograms from a dataframe
+
+create_save_hist <- function(df){
+  
+  for(i in seq_along(df)){
+    
+    df_plot <- ggplot(df, aes(df[[i]])) +
+    geom_histogram() +
+    ggtitle(paste0("histogram of ", colnames(df[i]))) +
     xlab("")
+    print(df_plot)
+    plot(df_plot)
+    ggsave(df_plot, filename=paste(colnames(df[i]),".jpeg",sep=""))
+    
+  }
+  
 }
 
-
-#loop over the function using lapply
-df_plots <- lapply(df_hist, create_hist, data = df_hist)
-
-#save (jpeg format) the plots using lapply with ggsave
-lapply(names(df_plots), 
-       function(x) ggsave(filename=paste(x,".jpeg",sep=""), plot=df_plots[[x]]))
+#using the function to plot and save the histogram on the example dataset
+create_save_hist(df_hist)
