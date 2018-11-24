@@ -2,11 +2,13 @@
 #install.packages("ggplot2")
 #install.packages("cowplot")
 #install.packages("gridExtra")
+#install.packages("purrr")
 
 #load the required packages. If not already installed uncomment line 2 to 4 (see above).
 library(ggplot2)
 library(cowplot)
 library(gridExtra)
+library(purrr)
 
 #creat an example dataset with 10 columns
 
@@ -25,39 +27,24 @@ df_hist <- data.frame(hist_col1, hist_col2, hist_col3, hist_col4, hist_col5, his
 
 #function to plot and save multiple histograms from a dataframe
 
-create_save_hist <- function(df){
+create_save_hist <- function(df, names){
   
-  list_plots <- list()
-  
-  for(i in seq_along(df)){
-    
-    #get p-value for normality test (Shapiro-Wilk’s test)
-    
-    shapiro_test_results <- shapiro.test(df[[i]])
-    shapiro_P <- shapiro_test_results$p.value
-    
-    df_plot <- ggplot(df, aes(df[[i]])) +
+    df_plot <- ggplot(as.data.frame(df), aes(df)) +
       geom_histogram() +
-      ggtitle(paste0("histogram of ", colnames(df[i]), ", P-value Shapiro-Wilk = ", round(shapiro_P, digits = 2))) +
+      ggtitle(paste0("histogram of ", names)) +
       xlab("")
     
     #save the plot (uncomment if you want to save the plot to your current working directory)
-    
     #ggsave(df_plot, filename=paste(colnames(df[i]),".jpeg",sep=""))
-    
-    
-    list_plots <- c(list_plots, list(df_plot))
-    
-    
-  }
   
-  return(list_plots)
+  return(df_plot)
   
 }
 
+
 #using the function to plot and save the histogram on the example dataset
-list_output_functions <- create_save_hist(df_hist)
+list_output_functions <- map2(df_hist, names(df_hist), create_save_hist)
 
 
 #print in a grid (select number of plots per grid. in this example the first two histograms are plotted)
-plot_grid(plotlist = list_output_functions[1:2], labels=c('A','B'), align = "h", ncol = 2, rel_widths = c(1,1))
+plot_grid(plotlist = list_output_functions[1:10], align = "h", ncol = 2)
